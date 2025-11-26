@@ -1,5 +1,6 @@
 import { Building2, Calendar, LifeBuoy, DollarSign } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { MfaSetupBanner } from '@/components/mfa/MfaSetupBanner'
 
 const metrics = [
   {
@@ -37,6 +38,9 @@ export default function DashboardPage() {
           Resumen general del panel de administración
         </p>
       </div>
+
+      {/* MFA Setup Banner */}
+      <MfaSetupBanner />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {metrics.map((metric) => {

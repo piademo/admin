@@ -81,6 +81,9 @@ export function AdminHeader() {
           <DropdownMenuItem onClick={() => router.push('/profile')}>
             Perfil
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push('/mfa/setup')}>
+            Configurar MFA
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout}>
             Cerrar sesión

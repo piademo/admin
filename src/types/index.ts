@@ -1,60 +1,80 @@
-// Platform User (Admin)
-export interface PlatformUser {
-  id: string
+// Re-export all database types
+export * from './database'
+
+// ============================================================================
+// EXTENDED UI TYPES
+// ============================================================================
+
+export interface SessionWithUser {
+  user: {
+    id: string
+    email: string
+    full_name: string
+    avatar_url: string | null
+    roles: string[]
+    permissions: string[]
+    mfa_enabled: boolean
+  }
+  session: {
+    id: string
+    expires_at: string
+  }
+}
+
+export interface ImpersonationContext {
+  is_impersonating: boolean
+  admin_user_id?: string
+  admin_email?: string
+  tenant_id?: string
+  tenant_name?: string
+  impersonation_id?: string
+  started_at?: string
+  expires_at?: string
+}
+
+// ============================================================================
+// FORM TYPES
+// ============================================================================
+
+export interface LoginFormData {
   email: string
+  password: string
+}
+
+export interface MfaSetupData {
+  secret: string
+  qr_code_url: string
+  backup_codes: string[]
+}
+
+export interface MfaVerifyData {
+  code: string
+}
+
+export interface TenantFormData {
   name: string
-  role: 'admin' | 'support'
-  avatar_url?: string
-  created_at: string
-  updated_at: string
+  slug: string
+  email: string
+  phone?: string
+  country: string
+  timezone: string
+  plan: string
 }
 
-// Tenant
-export interface Tenant {
-  id: string
-  name: string
-  domain: string
-  logo_url?: string
-  status: 'active' | 'inactive' | 'suspended'
-  plan: 'free' | 'basic' | 'premium' | 'enterprise'
-  mrr: number
-  created_at: string
-  updated_at: string
+export interface BookingFilterData {
+  tenant_id?: string
+  status?: string
+  channel?: string
+  date_from?: string
+  date_to?: string
+  search?: string
 }
 
-// Booking
-export interface Booking {
-  id: string
+export interface TicketFormData {
   tenant_id: string
-  customer_name: string
-  customer_email: string
-  service_name: string
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
-  date: string
-  time: string
-  total_amount: number
-  created_at: string
-  updated_at: string
-}
-
-// Ticket
-export interface Ticket {
-  id: string
-  tenant_id: string
-  title: string
+  subject: string
   description: string
-  status: 'open' | 'in_progress' | 'resolved' | 'closed'
-  priority: 'low' | 'medium' | 'high' | 'urgent'
-  assigned_to?: string
-  created_by: string
-  created_at: string
-  updated_at: string
-}
-
-// Metrics
-export interface DashboardMetrics {
-  active_tenants: number
-  bookings_today: number
-  open_tickets: number
-  mrr: number
+  priority: string
+  booking_id?: string
+  user_id?: string
 }

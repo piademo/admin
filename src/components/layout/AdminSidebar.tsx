@@ -21,6 +21,8 @@ const navigation = [
   { name: 'Reservas', href: '/bookings', icon: Calendar },
   { name: 'Soporte', href: '/support', icon: LifeBuoy },
   { name: 'Reportes', href: '/reports', icon: BarChart3 },
+  { name: 'Roles', href: '/admin/roles', icon: BarChart3 },
+  { name: 'Usuarios', href: '/admin/users', icon: Building2 },
 ]
 
 export function AdminSidebar() {

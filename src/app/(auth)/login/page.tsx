@@ -39,7 +39,7 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       })
@@ -49,6 +49,22 @@ export default function LoginPage() {
         return
       }
 
+      // Check if user is a platform admin and if MFA is enabled
+      if (authData.user) {
+        const { data: platformUser } = await supabase
+          .from('platform_users')
+          .select('mfa_enabled')
+          .eq('auth_user_id', authData.user.id)
+          .single()
+
+        if (platformUser?.mfa_enabled) {
+          // Redirect to MFA verification
+          router.push('/mfa/verify')
+          return
+        }
+      }
+
+      // No MFA, go to dashboard
       router.push('/')
       router.refresh()
     } catch {

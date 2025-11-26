@@ -6,61 +6,121 @@ Panel de administración para BookFast - Sistema de gestión multi-tenant para s
 
 Panel administrativo construido con Next.js 16, TypeScript y Tailwind CSS v4 para gestionar tenants, reservas, soporte y reportes de la plataforma BookFast.
 
-## ✨ Características
+## ✨ Características Implementadas
 
-- 🎨 Modo oscuro por defecto con tema Zinc
-- 🔐 Autenticación con Supabase
-- 📊 Dashboard con métricas en tiempo real
-- 👥 Gestión de tenants
-- 📅 Administración de reservas
-- 🎫 Sistema de soporte
-- 📈 Reportes y analytics
-- 🎯 Componentes reutilizables con shadcn/ui
-- 🔒 Middleware de protección de rutas
+### Sprint 1: Infraestructura y Seguridad ✅
+- [x] 🔐 Autenticación admin aislada (platform_users)
+- [x] 🎨 UI Base con shadcn/ui y Tailwind v4
+- [x] 📊 Dashboard básico con métricas
+- [x] 🔒 Middleware de protección de rutas
+- [x] 📝 Sistema de auditoría completo
+- [x] 👥 RBAC (Roles y permisos granulares)
+- [ ] 🔑 MFA obligatorio con TOTP
+- [ ] ⏱️ Rate limiting con Upstash Redis
+- [ ] 🖥️ Gestión de sesiones activas
+
+### Sprint 2: Gestión de Tenants (En progreso)
+- [ ] CRUD completo de tenants
+- [ ] Ciclo de vida (trial, active, suspended, etc.)
+- [ ] Búsqueda avanzada y filtros
+- [ ] Impersonación segura con auditoría
+- [ ] Export GDPR por tenant
+
+### Sprint 3: Gestión de Bookings
+- [ ] Buscador global de reservas
+- [ ] Acciones rápidas (cancelar, refund, mover)
+- [ ] Wizard de resolución de conflictos
+- [ ] Integración con Stripe
+- [ ] Notificaciones automáticas
 
 ## 🛠️ Stack Tecnológico
 
 - **Framework:** Next.js 16 (App Router)
-- **Lenguaje:** TypeScript
+- **Lenguaje:** TypeScript 5
 - **Estilos:** Tailwind CSS v4
-- **UI Components:** shadcn/ui
-- **Base de Datos:** Supabase
+- **UI Components:** shadcn/ui + Radix UI
+- **Base de Datos:** Supabase (PostgreSQL)
+- **Autenticación:** Supabase Auth
 - **Validación:** Zod + React Hook Form
 - **Iconos:** Lucide React
 
 ## 📦 Requisitos
 
 - Node.js 18.x o superior
-- npm o yarn
+- npm, pnpm o yarn
 - Cuenta de Supabase
 
 ## 🚀 Instalación
 
-1. Clonar el repositorio:
+### 1. Clonar el repositorio
+
 ```bash
-git clone <repository-url>
+git clone https://github.com/piademo/admin.git
 cd admin
 ```
 
-2. Instalar dependencias:
+### 2. Instalar dependencias
+
 ```bash
 npm install
 ```
 
-3. Configurar variables de entorno:
+### 3. Configurar variables de entorno
+
 ```bash
 cp .env.example .env
 ```
 
 Editar `.env` con tus credenciales de Supabase:
+
 ```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 NEXT_PUBLIC_APP_URL=http://localhost:3001
 ```
 
-4. Ejecutar en modo desarrollo:
+### 4. Ejecutar migraciones de base de datos
+
+Ver instrucciones detalladas en [`supabase-migrations/README.md`](./supabase-migrations/README.md)
+
+**Resumen rápido:**
+1. Ve a [Supabase Dashboard](https://app.supabase.com) > SQL Editor
+2. Ejecuta el contenido de `supabase-migrations/001_platform_admin_security.sql`
+3. Verifica que se crearon las tablas en el esquema `platform`
+
+### 5. Crear primer usuario admin
+
+```sql
+-- En Supabase Dashboard > SQL Editor
+
+-- 1. Primero crea un usuario en Authentication > Add User
+-- 2. Luego ejecuta:
+
+INSERT INTO platform.platform_users (
+  auth_user_id,
+  email,
+  full_name,
+  status
+) VALUES (
+  'uuid-del-usuario-creado',
+  'admin@bookfast.es',
+  'Super Admin',
+  'active'
+);
+
+-- 3. Asigna el rol de super_admin:
+
+INSERT INTO platform.user_roles (user_id, role_id)
+SELECT pu.id, pr.id
+FROM platform.platform_users pu
+CROSS JOIN platform.platform_roles pr
+WHERE pu.email = 'admin@bookfast.es'
+AND pr.name = 'super_admin';
+```
+
+### 6. Ejecutar en modo desarrollo
+
 ```bash
 npm run dev
 ```
