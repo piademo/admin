@@ -43,7 +43,7 @@ async function getTenantStats() {
 
   return {
     total: tenantsRes.count || 0,
-    active: tenantsRes.data?.filter(t => t.active !== false).length || 0,
+    active: (tenantsRes.data as any[])?.filter((t: any) => t.active !== false).length || 0,
     totalStaff: staffRes.count || 0,
     bookingsThisWeek: bookingsRes.count || 0,
   }
