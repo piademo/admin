@@ -66,13 +66,14 @@ async function getReportData() {
   // Fetch tenant names
   let topTenantsWithNames: Array<{ id: string; name: string; count: number }> = []
   if (topTenantIds.length > 0) {
-    const { data: tenantNames } = await supabase
+    const { data: tenantNamesRaw } = await supabase
       .from('tenants')
       .select('id, name')
       .in('id', topTenantIds.map(t => t.id))
+    const tenantNames = (tenantNamesRaw || []) as Array<{ id: string; name: string }>
     topTenantsWithNames = topTenantIds.map(t => ({
       ...t,
-      name: tenantNames?.find(n => n.id === t.id)?.name || t.id.slice(0, 8),
+      name: tenantNames.find(n => n.id === t.id)?.name || t.id.slice(0, 8),
     }))
   }
 
