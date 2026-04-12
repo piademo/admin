@@ -180,7 +180,7 @@ export async function revokeSession(sessionId: string, revokedBy: string, reason
       revoked_at: new Date().toISOString(),
       revoked_by: revokedBy,
       revoke_reason: reason,
-    })
+    } as any)
     .eq('id', sessionId)
   
   if (error) {
