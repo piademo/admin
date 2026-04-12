@@ -75,7 +75,7 @@ async function getRecentBookings() {
     console.error('Error fetching bookings:', error)
     return []
   }
-  return data || []
+  return (data || []) as any[]
 }
 
 export default async function BookingsPage() {
