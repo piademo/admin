@@ -13,20 +13,20 @@ export interface Database {
   public: {
     Tables: {
       [key: string]: {
-        Row: Record<string, unknown>
-        Insert: Record<string, unknown>
-        Update: Record<string, unknown>
+        Row: any
+        Insert: any
+        Update: any
       }
     }
     Views: {
       [key: string]: {
-        Row: Record<string, unknown>
+        Row: any
       }
     }
     Functions: {
       [key: string]: {
-        Args: Record<string, unknown>
-        Returns: unknown
+        Args: any
+        Returns: any
       }
     }
   }
@@ -142,14 +142,14 @@ export interface Database {
         }
       }
       [key: string]: {
-        Row: Record<string, unknown>
-        Insert: Record<string, unknown>
-        Update: Record<string, unknown>
+        Row: any
+        Insert: any
+        Update: any
       }
     }
     Views: {
       [key: string]: {
-        Row: Record<string, unknown>
+        Row: any
       }
     }
     Functions: {
@@ -180,8 +180,8 @@ export interface Database {
         Returns: string
       }
       [key: string]: {
-        Args: Record<string, unknown>
-        Returns: unknown
+        Args: any
+        Returns: any
       }
     }
   }

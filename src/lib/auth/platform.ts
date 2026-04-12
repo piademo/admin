@@ -152,18 +152,18 @@ export async function logAudit(params: {
 export async function getUserActiveSessions(userId: string) {
   const serviceClient = createServiceClient()
   
-  const { data, error } = await serviceClient
-    .from('admin_sessions')
+  const { data, error } = await (serviceClient
+    .from('admin_sessions') as any)
     .select('*')
     .eq('user_id', userId)
     .eq('is_active', true)
     .order('started_at', { ascending: false })
-  
+
   if (error) {
     throw error
   }
-  
-  return data
+
+  return data as any[]
 }
 
 /**
@@ -172,15 +172,15 @@ export async function getUserActiveSessions(userId: string) {
 export async function revokeSession(sessionId: string, revokedBy: string, reason: string) {
   const serviceClient = createServiceClient()
   
-  const { error } = await serviceClient
-    .from('admin_sessions')
+  const { error } = await (serviceClient
+    .from('admin_sessions') as any)
     .update({
       is_active: false,
       ended_at: new Date().toISOString(),
       revoked_at: new Date().toISOString(),
       revoked_by: revokedBy,
       revoke_reason: reason,
-    } as any)
+    })
     .eq('id', sessionId)
   
   if (error) {
@@ -204,8 +204,8 @@ export async function revokeSession(sessionId: string, revokedBy: string, reason
 export async function revokeAllSessions(userId: string, currentSessionId: string, revokedBy: string) {
   const serviceClient = createServiceClient()
   
-  const { error } = await serviceClient
-    .from('admin_sessions')
+  const { error } = await (serviceClient
+    .from('admin_sessions') as any)
     .update({
       is_active: false,
       ended_at: new Date().toISOString(),
@@ -245,8 +245,8 @@ export async function startImpersonation(params: {
   const serviceClient = createServiceClient()
   
   // Create impersonation record
-  const { data, error } = await serviceClient
-    .from('impersonations')
+  const { data, error } = await (serviceClient
+    .from('impersonations') as any)
     .insert({
       admin_user_id: params.adminUserId,
       admin_session_id: params.sessionId,
@@ -286,8 +286,8 @@ export async function startImpersonation(params: {
 export async function endImpersonation(impersonationId: string, adminUserId: string) {
   const serviceClient = createServiceClient()
   
-  const { error } = await serviceClient
-    .from('impersonations')
+  const { error } = await (serviceClient
+    .from('impersonations') as any)
     .update({
       is_active: false,
       ended_at: new Date().toISOString(),
@@ -315,8 +315,8 @@ export async function endImpersonation(impersonationId: string, adminUserId: str
 export async function getActiveImpersonation(adminUserId: string) {
   const serviceClient = createServiceClient()
   
-  const { data, error } = await serviceClient
-    .from('impersonations')
+  const { data, error } = await (serviceClient
+    .from('impersonations') as any)
     .select('*')
     .eq('admin_user_id', adminUserId)
     .eq('is_active', true)
