@@ -63,8 +63,8 @@ async function getDashboardData() {
     bookingsToday: bookingsToday.count || 0,
     revenue30d: revenueTotal,
     totalCustomers: totalCustomers.count || 0,
-    recentTenants: (recentTenants.data || []) as any[],
-    recentBookings: (recentBookings.data || []) as any[],
+    recentTenants: recentTenants.data || [],
+    recentBookings: recentBookings.data || [],
   }
 }
 

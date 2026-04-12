@@ -29,7 +29,7 @@ async function getTenants() {
     console.error('Error fetching tenants:', error)
     return []
   }
-  return data || []
+  return (data as any[]) || []
 }
 
 async function getTenantStats() {
