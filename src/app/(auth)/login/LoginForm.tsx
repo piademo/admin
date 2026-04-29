@@ -63,21 +63,8 @@ export function LoginForm() {
       }
 
       const { data: userData } = await supabase.auth.getUser()
-      const authUserId = userData.user?.id
-
-      if (!authUserId) {
+      if (!userData.user?.id) {
         setError('No se pudo validar la sesión')
-        return
-      }
-
-      const { data: platformUser } = await supabase
-        .from('platform_users')
-        .select('mfa_enabled')
-        .eq('auth_user_id', authUserId)
-        .single()
-
-      if (platformUser?.mfa_enabled) {
-        router.push('/mfa/verify')
         return
       }
 

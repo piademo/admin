@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
 import { NextResponse, type NextRequest } from 'next/server'
 
 /**
@@ -50,7 +51,13 @@ export async function proxy(request: NextRequest) {
   }
 
   if (user) {
-    const { data: platformUser, error } = await supabase
+    const serviceClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+
+    const { data: platformUser, error } = await serviceClient
+      .schema('platform')
       .from('platform_users')
       .select('id, status, mfa_enabled')
       .eq('auth_user_id', user.id)
