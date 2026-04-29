@@ -314,28 +314,31 @@ export async function endImpersonation(impersonationId: string, adminUserId: str
  */
 export async function getActiveImpersonation(adminUserId: string) {
   const serviceClient = createServiceClient()
-  
+
   const { data, error } = await (serviceClient
     .from('impersonations') as any)
     .select('*')
     .eq('admin_user_id', adminUserId)
     .eq('is_active', true)
     .single()
-  
+
   if (error || !data) {
     return null
   }
-  
+
   // Check if expired
   const startedAt = new Date(data.started_at)
   const maxDuration = data.max_duration_minutes * 60 * 1000
   const expiresAt = new Date(startedAt.getTime() + maxDuration)
-  
+
   if (new Date() > expiresAt) {
     // Auto-expire
     await endImpersonation(data.id, adminUserId)
     return null
   }
-  
+
   return data
 }
+
+/**
+ * 

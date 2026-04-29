@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { 
-  LayoutDashboard, 
-  Building2, 
-  Calendar, 
-  LifeBuoy, 
+import {
+  LayoutDashboard,
+  Building2,
+  Calendar,
+  LifeBuoy,
   BarChart3,
+  CheckCircle2,
   LogOut
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -17,6 +18,7 @@ import { useRouter } from 'next/navigation'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Tareas', href: '/tasks', icon: CheckCircle2 },
   { name: 'Tenants', href: '/tenants', icon: Building2 },
   { name: 'Reservas', href: '/bookings', icon: Calendar },
   { name: 'Soporte', href: '/support', icon: LifeBuoy },

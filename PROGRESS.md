@@ -49,6 +49,33 @@
 
 ## 🚧 En Progreso
 
+### Issue #29: Integración de Agent Task Management ✅ (API Routes Complete)
+
+**Completado:**
+- ✅ GET `/api/agents/tasks` - List tasks with filtering
+- ✅ POST `/api/agents/tasks/create` - Create new tasks
+- ✅ PATCH `/api/agents/tasks/[id]` - Manage tasks (approve/reject/retry/reassign)
+- ✅ POST `/api/agents/callback` - Agent task completion reporting
+- ✅ Full admin authentication on all endpoints
+- ✅ Audit logging for all task operations
+- ✅ ARCHITECTURE.md document with security design
+
+**Archivos creados:**
+- `src/app/api/agents/tasks/route.ts` - GET/POST tasks listing
+- `src/app/api/agents/tasks/create/route.ts` - Task creation
+- `src/app/api/agents/tasks/[id]/route.ts` - Task management
+- `src/app/api/agents/callback/route.ts` - Agent callbacks
+- `ARCHITECTURE.md` - Architecture and security documentation
+
+**Por implementar:**
+- [ ] UI Dashboard para agent tasks
+- [ ] Página `/agents/tasks` con lista filtrable
+- [ ] Task detail modal con historial
+- [ ] Bulk actions (multiple approve/reject)
+- [ ] Task analytics y performance metrics
+
+---
+
 ### Issue #24: MFA Obligatorio (TOTP)
 
 **Por implementar:**
@@ -186,13 +213,19 @@ npm install @upstash/redis @upstash/ratelimit
 
 ## 📊 Progreso General
 
-**Sprint 1 (Infraestructura y Seguridad):** 20% completado
+**Sprint 1 (Infraestructura y Seguridad):** 35% completado
 - ✅ Auth aislada (Issue #23)
+- ✅ Agent Task API Integration (Issue #29)
 - 🚧 MFA (Issue #24)
 - ⏳ Roles UI (Issue #25)
 - ⏳ Sesiones (Issue #26)
 - ⏳ Rate Limiting (Issue #27)
 - ⏳ Auditoría UI (Issue #28)
+
+**Sprint 1.5 (Agent Management UI):** 5% completado
+- ⏳ Agent tasks dashboard
+- ⏳ Task management UI
+- ⏳ Bulk operations
 
 **Sprint 2 (Tenants):** 0% completado
 
