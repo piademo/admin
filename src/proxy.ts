@@ -1,5 +1,4 @@
 import { createServerClient } from '@supabase/ssr'
-import { createClient } from '@supabase/supabase-js'
 import { NextResponse, type NextRequest } from 'next/server'
 
 /**
@@ -51,20 +50,12 @@ export async function proxy(request: NextRequest) {
   }
 
   if (user) {
-    const serviceClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    const { data, error } = await supabase.rpc('get_platform_user_auth_state', {
+      p_user_id: user.id,
+    })
+    const platformUser = Array.isArray(data) ? data[0] : null
 
-    const { data: platformUser, error } = await serviceClient
-      .schema('platform')
-      .from('platform_users')
-      .select('id, status, mfa_enabled')
-      .eq('auth_user_id', user.id)
-      .eq('status', 'active')
-      .single()
-
-    if (error || !platformUser) {
+    if (error || !platformUser || platformUser.status !== 'active') {
       await supabase.auth.signOut()
       const url = request.nextUrl.clone()
       url.pathname = '/login'
