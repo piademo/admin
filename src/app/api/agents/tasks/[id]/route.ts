@@ -171,11 +171,11 @@ export async function PATCH(
     }
 
     // 5. Update task
-    const { data: updatedTask, error: updateError } = await (supabase
-      .from('agent_tasks')
+    const { data: updatedTask, error: updateError } = await ((supabase
+      .from('agent_tasks') as any)
       .update(updateData)
       .eq('id', taskId)
-      .select() as any);
+      .select());
 
     if (updateError) {
       console.error('Error updating agent task:', updateError);

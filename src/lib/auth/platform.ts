@@ -341,4 +341,53 @@ export async function getActiveImpersonation(adminUserId: string) {
 }
 
 /**
- * 
+ * Validate platform admin from NextRequest
+ * Used by API endpoints to check authentication and authorization
+ *
+ * Returns user object or null if not authenticated/authorized
+ */
+export async function validatePlatformAdmin(request: any): Promise<{
+  user: (PlatformUser & { roles: PlatformRole[] }) | null
+  error: string | null
+}> {
+  try {
+    const supabase = await createClient()
+
+    // Get current auth session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+
+    if (sessionError || !session) {
+      return { user: null, error: 'No active session' }
+    }
+
+    // Get platform user
+    const platformUser = await getCurrentPlatformUser()
+
+    if (!platformUser) {
+      return { user: null, error: 'Not a platform user' }
+    }
+
+    // Verify admin status
+    const isAdmin = await verifyPlatformAdmin(session.user.id)
+
+    if (!isAdmin) {
+      return { user: null, error: 'User does not have admin role' }
+    }
+
+    // Get user roles
+    const roles = await getUserRoles(platformUser.id)
+
+    return {
+      user: {
+        ...platformUser,
+        roles,
+      },
+      error: null,
+    }
+  } catch (error: any) {
+    return {
+      user: null,
+      error: error.message || 'Authentication error',
+    }
+  }
+}

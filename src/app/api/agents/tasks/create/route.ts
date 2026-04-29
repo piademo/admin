@@ -59,8 +59,8 @@ export async function POST(request: NextRequest) {
 
     // 4. Create task
     const supabase = createServiceClient();
-    const { data: newTask, error: createError } = await (supabase
-      .from('agent_tasks')
+    const { data: newTask, error: createError } = await ((supabase
+      .from('agent_tasks') as any)
       .insert({
         type,
         tenant_id,
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
-      .select() as any);
+      .select());
 
     if (createError) {
       console.error('Error creating agent task:', createError);

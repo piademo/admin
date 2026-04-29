@@ -81,11 +81,11 @@ export async function POST(request: NextRequest) {
       updateData.metadata = metadata;
     }
 
-    const { data: updatedTask, error: updateError } = await (supabase
-      .from('agent_tasks')
+    const { data: updatedTask, error: updateError } = await ((supabase
+      .from('agent_tasks') as any)
       .update(updateData)
       .eq('id', task_id)
-      .select() as any);
+      .select());
 
     if (updateError) {
       console.error('Error updating agent task:', updateError);

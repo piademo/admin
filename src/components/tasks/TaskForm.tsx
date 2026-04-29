@@ -50,7 +50,7 @@ export function TaskForm({
   const [payloadText, setPayloadText] = useState('{}');
   const [payloadError, setPayloadError] = useState<string | null>(null);
 
-  const form = useForm({
+  const form = useForm<any>({
     defaultValues: {
       type: 'data_sync',
       tenant_id: '',

@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ButtonHTMLAttributes } from "react"
 
-const Pagination = ({ className, ...props }: React.HTMLAttributes<HTMLNav>) => (
+const Pagination = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
   <nav
     role="navigation"
     aria-label="pagination"
@@ -63,7 +63,6 @@ const PaginationPrevious = React.forwardRef<
   <PaginationLink
     ref={ref}
     aria-label="Go to previous page"
-    size={undefined}
     className={cn("gap-1 pl-2.5", className)}
     {...props}
   >
@@ -80,7 +79,6 @@ const PaginationNext = React.forwardRef<
   <PaginationLink
     ref={ref}
     aria-label="Go to next page"
-    size={undefined}
     className={cn("gap-1 pr-2.5", className)}
     {...props}
   >

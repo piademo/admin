@@ -12,11 +12,11 @@ export default function TasksPage() {
 
   const handleFilterChange = (newFilters: TaskFilters) => {
     setFilters(newFilters);
-    setPagination({ limit: 50, offset: 0 });
+    setPagination({ limit: 50, offset: 0, total: 0, hasMore: false });
   };
 
   const handlePaginationChange = (limit: number, offset: number) => {
-    setPagination({ limit, offset });
+    setPagination({ limit, offset, total: pagination.total, hasMore: pagination.hasMore });
   };
 
   return (

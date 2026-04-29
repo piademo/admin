@@ -50,7 +50,7 @@ export default function RolesPage() {
     setError('')
     const { error } = await supabase
       .from('platform_roles')
-      .update(data)
+      .update(data as any)
       .eq('id', editingRole.id)
     if (error) setError('No se pudo actualizar el rol')
     else {

@@ -61,9 +61,12 @@ export function useTasks(filters?: TaskFilters, pagination?: PaginationParams) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [paginationState, setPaginationState] = useState(
-    pagination || { limit: 50, offset: 0 }
-  );
+  const [paginationState, setPaginationState] = useState({
+    limit: pagination?.limit || 50,
+    offset: pagination?.offset || 0,
+    total: 0,
+    hasMore: false,
+  });
 
   const loadTasks = useCallback(async () => {
     setLoading(true);

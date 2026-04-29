@@ -10,7 +10,7 @@ export default function CreateTaskPage() {
   const router = useRouter();
   const { createTask } = useTasks();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | undefined>();
   const [tenants, setTenants] = useState<Array<{ id: string; name: string }>>([]);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function CreateTaskPage() {
 
   const handleSubmit = async (data: CreateTaskPayload) => {
     setIsLoading(true);
-    setError(null);
+    setError(undefined);
 
     try {
       await createTask(data);
