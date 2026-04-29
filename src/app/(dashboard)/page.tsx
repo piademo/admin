@@ -23,7 +23,7 @@ async function getDashboardData() {
     recentTenants,
     recentBookings,
   ] = await Promise.all([
-    supabase.from('tenants').select('id', { count: 'exact' }).neq('active', false),
+    supabase.from('tenants').select('id', { count: 'exact' }).neq('is_active', false),
     supabase.from('bookings').select('id', { count: 'exact' })
       .gte('starts_at', today.toISOString())
       .lt('starts_at', tomorrow.toISOString()),
@@ -33,7 +33,7 @@ async function getDashboardData() {
       .gte('created_at', thirtyDaysAgo.toISOString()),
     supabase.from('customers').select('id', { count: 'exact' }),
     supabase.from('tenants')
-      .select('id, name, slug, email, city, country, active, plan, created_at')
+      .select('id, name, slug, is_active, created_at')
       .order('created_at', { ascending: false })
       .limit(5),
     supabase.from('bookings')
@@ -175,13 +175,13 @@ export default async function DashboardPage() {
                       <div>
                         <p className="text-sm font-medium leading-none">{tenant.name || '—'}</p>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          {tenant.city || tenant.country || tenant.email || `/${tenant.slug || tenant.id.slice(0, 8)}`}
+                          {`/${tenant.slug || tenant.id.slice(0, 8)}`}
                         </p>
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <Badge variant={tenant.active !== false ? 'default' : 'secondary'} className="text-xs">
-                        {tenant.active !== false ? 'Activo' : 'Inactivo'}
+                      <Badge variant={tenant.is_active !== false ? 'default' : 'secondary'} className="text-xs">
+                        {tenant.is_active !== false ? 'Activo' : 'Inactivo'}
                       </Badge>
                       <p className="text-xs text-muted-foreground mt-1">
                         {tenant.created_at

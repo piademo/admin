@@ -13,14 +13,8 @@ async function getTenants() {
       id,
       name,
       slug,
-      email,
-      phone,
-      city,
-      country,
-      active,
-      plan,
-      created_at,
-      timezone
+      is_active,
+      created_at
     `)
     .order('created_at', { ascending: false })
     .limit(100)
@@ -36,14 +30,14 @@ async function getTenantStats() {
   const supabase = createServiceClient()
 
   const [tenantsRes, staffRes, bookingsRes] = await Promise.all([
-    supabase.from('tenants').select('id, active', { count: 'exact' }),
+    supabase.from('tenants').select('id, is_active', { count: 'exact' }),
     supabase.from('staff').select('id', { count: 'exact' }),
     supabase.from('bookings').select('id', { count: 'exact' }).gte('created_at', new Date(Date.now() - 7 * 86400000).toISOString()),
   ])
 
   return {
     total: tenantsRes.count || 0,
-    active: (tenantsRes.data as any[])?.filter((t: any) => t.active !== false).length || 0,
+    active: (tenantsRes.data as any[])?.filter((t: any) => t.is_active !== false).length || 0,
     totalStaff: staffRes.count || 0,
     bookingsThisWeek: bookingsRes.count || 0,
   }
@@ -117,22 +111,18 @@ export default async function TenantsPage() {
                   </div>
 
                   <div className="col-span-3 text-sm text-muted-foreground">
-                    <p className="truncate">{tenant.email || '—'}</p>
-                    {tenant.phone && <p className="text-xs">{tenant.phone}</p>}
+                    <p className="truncate">/{tenant.slug || tenant.id.slice(0, 8)}</p>
                   </div>
 
                   <div className="col-span-2 text-sm text-muted-foreground flex items-center gap-1">
                     <MapPin className="h-3 w-3 flex-shrink-0" />
-                    <span className="truncate">{tenant.city || tenant.country || '—'}</span>
+                    <span className="truncate">—</span>
                   </div>
 
                   <div className="col-span-2">
-                    <Badge variant={tenant.active !== false ? 'default' : 'secondary'}>
-                      {tenant.active !== false ? 'Activo' : 'Inactivo'}
+                    <Badge variant={tenant.is_active !== false ? 'default' : 'secondary'}>
+                      {tenant.is_active !== false ? 'Activo' : 'Inactivo'}
                     </Badge>
-                    {tenant.plan && (
-                      <p className="text-xs text-muted-foreground mt-0.5 capitalize">{tenant.plan}</p>
-                    )}
                   </div>
 
                   <div className="col-span-2 text-xs text-muted-foreground">

@@ -23,7 +23,7 @@ export default function CreateTaskPage() {
       const { data, error: err } = await supabase
         .from('tenants')
         .select('id, name')
-        .eq('active', true)
+        .eq('is_active', true)
         .limit(100);
 
       if (err) throw err;

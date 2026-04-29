@@ -66,7 +66,7 @@ async function getRecentBookings() {
       tenant_id,
       customer:customers(name, email),
       service:services(name, price_cents),
-      staff:staff(name)
+      staff:staff!bookings_staff_id_fkey(name)
     `)
     .order('starts_at', { ascending: false })
     .limit(50)
