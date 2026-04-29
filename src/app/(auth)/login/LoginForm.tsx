@@ -2,62 +2,83 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/client'
 
-const loginSchema = z.object({
-  email: z.string().email('Email inválido'),
-  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
-})
-
-type LoginFormData = z.infer<typeof loginSchema>
-
 export function LoginForm() {
   const router = useRouter()
   const supabase = createClient()
+  const [email, setEmail] = useState('')
+  const [code, setCode] = useState('')
+  const [codeSent, setCodeSent] = useState(false)
   const [error, setError] = useState<string>('')
+  const [success, setSuccess] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-  })
-
-  const onSubmit = async (data: LoginFormData) => {
+  const requestCode = async () => {
     setIsLoading(true)
     setError('')
+    setSuccess('')
 
     try {
-      const { data: authData, error } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
+      const { error: otpError } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: false,
+        },
       })
 
-      if (error) {
-        setError('Credenciales incorrectas')
+      if (otpError) {
+        setError('No se pudo enviar el código. Revisa el email.')
         return
       }
 
-      if (authData.user) {
-        const { data: platformUser } = await supabase
-          .from('platform_users')
-          .select('mfa_enabled')
-          .eq('auth_user_id', authData.user.id)
-          .single()
+      setCodeSent(true)
+      setSuccess('Te hemos enviado un código por correo.')
+    } catch {
+      setError('Error al enviar el código')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-        if (platformUser?.mfa_enabled) {
-          router.push('/mfa/verify')
-          return
-        }
+  const verifyCode = async () => {
+    setIsLoading(true)
+    setError('')
+    setSuccess('')
+
+    try {
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email,
+        token: code,
+        type: 'email',
+      })
+
+      if (verifyError) {
+        setError('Código inválido o expirado')
+        return
+      }
+
+      const { data: userData } = await supabase.auth.getUser()
+      const authUserId = userData.user?.id
+
+      if (!authUserId) {
+        setError('No se pudo validar la sesión')
+        return
+      }
+
+      const { data: platformUser } = await supabase
+        .from('platform_users')
+        .select('mfa_enabled')
+        .eq('auth_user_id', authUserId)
+        .single()
+
+      if (platformUser?.mfa_enabled) {
+        router.push('/mfa/verify')
+        return
       }
 
       router.push('/')
@@ -77,38 +98,37 @@ export function LoginForm() {
             BookFast Admin
           </CardTitle>
           <CardDescription>
-            Ingresa tus credenciales para acceder al panel
+            Accede con código de verificación por correo
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="admin@bookfast.com"
-                {...register('email')}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
               />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
-              )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                {...register('password')}
-                disabled={isLoading}
-              />
-              {errors.password && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
-              )}
-            </div>
+            {codeSent && (
+              <div className="space-y-2">
+                <Label htmlFor="code">Código</Label>
+                <Input
+                  id="code"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="123456"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  disabled={isLoading}
+                />
+              </div>
+            )}
 
             {error && (
               <div className="rounded-md bg-destructive/10 p-3">
@@ -116,10 +136,43 @@ export function LoginForm() {
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
-            </Button>
-          </form>
+            {success && (
+              <div className="rounded-md bg-emerald-500/10 p-3">
+                <p className="text-sm text-emerald-400">{success}</p>
+              </div>
+            )}
+
+            {!codeSent ? (
+              <Button
+                type="button"
+                className="w-full"
+                disabled={isLoading || !email}
+                onClick={requestCode}
+              >
+                {isLoading ? 'Enviando código...' : 'Enviar código'}
+              </Button>
+            ) : (
+              <div className="space-y-2">
+                <Button
+                  type="button"
+                  className="w-full"
+                  disabled={isLoading || !email || !code}
+                  onClick={verifyCode}
+                >
+                  {isLoading ? 'Verificando...' : 'Entrar con código'}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  disabled={isLoading || !email}
+                  onClick={requestCode}
+                >
+                  Reenviar código
+                </Button>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
