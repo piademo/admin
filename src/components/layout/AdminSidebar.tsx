@@ -5,10 +5,11 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
   Building2,
-  Calendar,
-  LifeBuoy,
-  BarChart3,
   CheckCircle2,
+  CreditCard,
+  ToggleLeft,
+  Shield,
+  UserCog,
   LogOut
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -18,13 +19,14 @@ import { useRouter } from 'next/navigation'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Tareas', href: '/tasks', icon: CheckCircle2 },
   { name: 'Tenants', href: '/tenants', icon: Building2 },
-  { name: 'Reservas', href: '/bookings', icon: Calendar },
-  { name: 'Soporte', href: '/support', icon: LifeBuoy },
-  { name: 'Reportes', href: '/reports', icon: BarChart3 },
-  { name: 'Roles', href: '/admin/roles', icon: BarChart3 },
-  { name: 'Usuarios', href: '/admin/users', icon: Building2 },
+  { name: 'Planes', href: '/plans', icon: CreditCard },
+  { name: 'Features', href: '/features', icon: ToggleLeft },
+  { name: 'Impersonación', href: '/impersonations', icon: Shield },
+  { name: 'Auditoría', href: '/audit', icon: Shield },
+  { name: 'Tareas (Agentes)', href: '/tasks', icon: CheckCircle2 },
+  { name: 'Admins · Usuarios', href: '/admin/users', icon: UserCog },
+  { name: 'Admins · Roles', href: '/admin/roles', icon: UserCog },
 ]
 
 export function AdminSidebar() {

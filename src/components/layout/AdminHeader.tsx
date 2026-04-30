@@ -19,9 +19,13 @@ import { useEffect, useState } from 'react'
 const routeNames: Record<string, string> = {
   '/': 'Dashboard',
   '/tenants': 'Tenants',
-  '/bookings': 'Reservas',
-  '/support': 'Soporte',
-  '/reports': 'Reportes',
+  '/plans': 'Planes',
+  '/features': 'Features',
+  '/impersonations': 'Impersonación',
+  '/audit': 'Auditoría',
+  '/tasks': 'Tareas',
+  '/admin/users': 'Admins · Usuarios',
+  '/admin/roles': 'Admins · Roles',
 }
 
 export function AdminHeader() {

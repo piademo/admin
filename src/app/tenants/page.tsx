@@ -1,7 +1,8 @@
 import { createServiceClient } from '@/lib/supabase/service'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Building2, Users, Calendar, MapPin } from 'lucide-react'
+import Link from 'next/link'
+import { Building2, Users, Calendar, Globe, CreditCard } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 
@@ -13,7 +14,10 @@ async function getTenants() {
       id,
       name,
       slug,
-      is_active,
+      timezone,
+      public_subdomain,
+      stripe_onboarding_status,
+      stripe_charges_enabled,
       created_at
     `)
     .order('created_at', { ascending: false })
@@ -30,14 +34,14 @@ async function getTenantStats() {
   const supabase = createServiceClient()
 
   const [tenantsRes, staffRes, bookingsRes] = await Promise.all([
-    supabase.from('tenants').select('id, is_active', { count: 'exact' }),
+    supabase.from('tenants').select('id', { count: 'exact' }),
     supabase.from('staff').select('id', { count: 'exact' }),
     supabase.from('bookings').select('id', { count: 'exact' }).gte('created_at', new Date(Date.now() - 7 * 86400000).toISOString()),
   ])
 
   return {
     total: tenantsRes.count || 0,
-    active: (tenantsRes.data as any[])?.filter((t: any) => t.is_active !== false).length || 0,
+    active: tenantsRes.count || 0,
     totalStaff: staffRes.count || 0,
     bookingsThisWeek: bookingsRes.count || 0,
   }
@@ -50,7 +54,7 @@ export default async function TenantsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Tenants</h1>
-        <p className="text-muted-foreground">Gestión de barberías y negocios activos</p>
+        <p className="text-muted-foreground">Gestión de organizaciones/negocios (alta, configuración, suscripción)</p>
       </div>
 
       {/* KPI Cards */}
@@ -83,10 +87,10 @@ export default async function TenantsPage() {
           <div className="space-y-2">
             {/* Header */}
             <div className="grid grid-cols-12 gap-3 px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b">
-              <div className="col-span-3">Negocio</div>
-              <div className="col-span-3">Contacto</div>
-              <div className="col-span-2">Ubicación</div>
-              <div className="col-span-2">Plan</div>
+              <div className="col-span-4">Tenant</div>
+              <div className="col-span-2">Zona horaria</div>
+              <div className="col-span-2">Portal</div>
+              <div className="col-span-2">Stripe</div>
               <div className="col-span-2">Alta</div>
             </div>
 
@@ -94,34 +98,37 @@ export default async function TenantsPage() {
               <p className="text-sm text-muted-foreground py-8 text-center">No hay tenants registrados</p>
             ) : (
               tenants.map(tenant => (
-                <div
+                <Link
                   key={tenant.id}
+                  href={`/tenants/${tenant.id}`}
                   className="grid grid-cols-12 gap-3 px-3 py-3 rounded-lg hover:bg-secondary/30 transition-colors items-center"
                 >
-                  <div className="col-span-3">
+                  <div className="col-span-4">
                     <div className="flex items-center gap-2">
                       <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold">
                         {tenant.name?.charAt(0)?.toUpperCase() || '?'}
                       </div>
-                      <div>
-                        <p className="font-medium text-sm">{tenant.name || '—'}</p>
-                        <p className="text-xs text-muted-foreground">/{tenant.slug || tenant.id.slice(0, 8)}</p>
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm truncate">{tenant.name || '—'}</p>
+                        <p className="text-xs text-muted-foreground truncate">/{tenant.slug || tenant.id.slice(0, 8)}</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="col-span-3 text-sm text-muted-foreground">
-                    <p className="truncate">/{tenant.slug || tenant.id.slice(0, 8)}</p>
+                  <div className="col-span-2 text-sm text-muted-foreground">
+                    {tenant.timezone || '—'}
                   </div>
 
-                  <div className="col-span-2 text-sm text-muted-foreground flex items-center gap-1">
-                    <MapPin className="h-3 w-3 flex-shrink-0" />
-                    <span className="truncate">—</span>
+                  <div className="col-span-2 text-sm text-muted-foreground flex items-center gap-1 min-w-0">
+                    <Globe className="h-3 w-3 flex-shrink-0" />
+                    <span className="truncate">
+                      {tenant.public_subdomain || tenant.portal_url || '—'}
+                    </span>
                   </div>
 
                   <div className="col-span-2">
-                    <Badge variant={tenant.is_active !== false ? 'default' : 'secondary'}>
-                      {tenant.is_active !== false ? 'Activo' : 'Inactivo'}
+                    <Badge variant={tenant.stripe_charges_enabled ? 'default' : 'secondary'} className="text-xs">
+                      {tenant.stripe_charges_enabled ? 'Cobros OK' : (tenant.stripe_onboarding_status || 'pending')}
                     </Badge>
                   </div>
 
@@ -130,9 +137,30 @@ export default async function TenantsPage() {
                       ? format(new Date(tenant.created_at), 'd MMM yyyy', { locale: es })
                       : '—'}
                   </div>
-                </div>
+                </Link>
               ))
             )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-base">Acciones</CardTitle>
+          <Link
+            href="/tenants/new"
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            <Building2 className="h-4 w-4" />
+            Dar de alta tenant
+          </Link>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground">
+          <div className="flex items-start gap-2">
+            <CreditCard className="h-4 w-4 mt-0.5" />
+            <p>
+              Para cambiar <span className="text-foreground font-medium">plan/suscripción</span> entra en un tenant y usa la sección “Suscripción”.
+            </p>
           </div>
         </CardContent>
       </Card>
