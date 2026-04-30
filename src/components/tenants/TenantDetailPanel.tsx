@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { TenantFeaturesCard } from '@/components/tenants/TenantFeaturesCard'
 
 export type TenantDetailData = {
   tenant: {
@@ -32,6 +33,14 @@ export type TenantDetailData = {
     billing_state: string | null
     renew_at: string | null
   }
+  features?: Array<{ key: string; name: string; default_enabled: boolean }>
+  overrides?: Array<{
+    feature_key: string
+    enabled: boolean
+    quota_limit: any
+    reason: string | null
+    expires_at: string | null
+  }>
 }
 
 export function TenantDetailPanel({ data }: { data: TenantDetailData }) {
@@ -199,6 +208,12 @@ export function TenantDetailPanel({ data }: { data: TenantDetailData }) {
           </CardContent>
         </Card>
       </div>
+
+      <TenantFeaturesCard
+        tenantId={tenant.id}
+        features={data.features || []}
+        overrides={data.overrides || []}
+      />
     </div>
   )
 }

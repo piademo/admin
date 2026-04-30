@@ -29,7 +29,22 @@ async function getTenantDetail(id: string): Promise<TenantDetailData | null> {
     orgPlan = null
   }
 
-  return { tenant: tenant as any, orgPlan }
+  // Features + overrides (best-effort via RPCs)
+  let features: TenantDetailData['features'] = []
+  let overrides: TenantDetailData['overrides'] = []
+  try {
+    const [featuresRes, overridesRes] = await Promise.all([
+      (supabase as any).rpc('admin_list_features'),
+      (supabase as any).rpc('admin_list_org_feature_overrides', { p_org_id: id }),
+    ])
+    features = (featuresRes?.data || []) as any
+    overrides = (overridesRes?.data || []) as any
+  } catch {
+    features = []
+    overrides = []
+  }
+
+  return { tenant: tenant as any, orgPlan, features, overrides }
 }
 
 export default async function TenantDetailPage({ params }: { params: Promise<{ id: string }> }) {

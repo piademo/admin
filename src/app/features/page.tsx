@@ -5,9 +5,8 @@ import { Badge } from '@/components/ui/badge'
 async function getFeatures() {
   const supabase = createServiceClient()
   try {
-    // Si no expones `platform`, tendrás que añadir una RPC similar a admin_list_plans.
-    // Por ahora, devolvemos vacío para no romper la UI.
-    return []
+    const { data } = await (supabase as any).rpc('admin_list_features')
+    return (data || []) as any[]
   } catch {
     return []
   }
@@ -30,7 +29,7 @@ export default async function FeaturesPage() {
         <CardContent className="space-y-3">
           {features.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              Pendiente: exponer `platform` en Supabase o añadir una RPC en `public` para listar features.
+              No se pudieron cargar features. Ejecuta la migración `003_platform_features_admin_rpc.sql` en Supabase.
             </p>
           ) : (
             features.map((f) => (
