@@ -12,23 +12,53 @@ import type { Json } from './database'
 export interface Database {
   public: {
     Tables: {
+      tenants: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          timezone: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          address: string | null
+          public_subdomain: string | null
+          created_at: string
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          slug: string
+          timezone?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          address?: string | null
+          public_subdomain?: string | null
+          created_at?: string
+          updated_at?: string | null
+        }
+        Update: {
+          name?: string
+          slug?: string
+          timezone?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          address?: string | null
+          public_subdomain?: string | null
+          created_at?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       [key: string]: {
         Row: any
         Insert: any
         Update: any
+        Relationships: any[]
       }
     }
-    Views: {
-      [key: string]: {
-        Row: any
-      }
-    }
-    Functions: {
-      [key: string]: {
-        Args: any
-        Returns: any
-      }
-    }
+    Views: {}
+    Functions: {}
   }
   platform: {
     Tables: {
@@ -84,6 +114,7 @@ export interface Database {
           updated_at?: string
           created_by?: string | null
         }
+        Relationships: []
       }
       audit_logs: {
         Row: {
@@ -140,11 +171,13 @@ export interface Database {
           created_at?: string
           severity?: string
         }
+        Relationships: []
       }
       [key: string]: {
         Row: any
         Insert: any
         Update: any
+        Relationships: any[]
       }
     }
     Views: {

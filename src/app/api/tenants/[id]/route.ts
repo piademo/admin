@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { validatePlatformAdmin, logAudit } from '@/lib/auth/platform'
+import type { Database } from '@/types/supabase'
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { user, error } = await validatePlatformAdmin(request)
@@ -32,14 +33,17 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   try {
     const body = await request.json()
-    const update: Record<string, unknown> = {}
-    for (const key of ['name', 'slug', 'timezone', 'contact_email', 'contact_phone', 'address', 'public_subdomain']) {
-      if (key in (body || {})) update[key] = body[key]
+    const update: Database['public']['Tables']['tenants']['Update'] = {}
+    for (const key of ['name', 'slug', 'timezone', 'contact_email', 'contact_phone', 'address', 'public_subdomain'] as const) {
+      if (key in (body || {})) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        update[key] = body[key]
+      }
     }
 
     const { data, error: dbError } = await supabase
       .from('tenants')
-      .update(update as any)
+      .update(update)
       .eq('id', id)
       .select('id,name,slug,timezone,contact_email,contact_phone,address,public_subdomain,updated_at')
       .maybeSingle()

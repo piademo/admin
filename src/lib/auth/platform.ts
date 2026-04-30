@@ -22,7 +22,7 @@ export async function getCurrentPlatformUser(): Promise<PlatformUser | null> {
   }
   
   // Get platform user details using service client
-  const serviceClient = createServiceClient()
+  const serviceClient = createServiceClient().schema('platform')
   
   const { data: platformUser, error } = await serviceClient
     .from('platform_users')
@@ -42,7 +42,7 @@ export async function getCurrentPlatformUser(): Promise<PlatformUser | null> {
  * Get platform user roles
  */
 export async function getUserRoles(userId: string): Promise<PlatformRole[]> {
-  const serviceClient = createServiceClient()
+  const serviceClient = createServiceClient().schema('platform')
   
   const { data, error } = await serviceClient
     .from('user_roles')
@@ -64,7 +64,7 @@ export async function getUserRoles(userId: string): Promise<PlatformRole[]> {
  * Get platform user permissions
  */
 export async function getUserPermissions(userId: string): Promise<string[]> {
-  const serviceClient = createServiceClient()
+  const serviceClient = createServiceClient().schema('platform')
   
   const { data, error } = await serviceClient
     .rpc('get_user_permissions', { check_user_id: userId } as any)
@@ -105,7 +105,7 @@ export async function hasAllPermissions(userId: string, permissions: string[]): 
  * Verify platform admin status
  */
 export async function verifyPlatformAdmin(authUserId: string): Promise<boolean> {
-  const serviceClient = createServiceClient()
+  const serviceClient = createServiceClient().schema('platform')
   
   const { data, error } = await serviceClient
     .rpc('is_platform_admin', { check_user_id: authUserId } as any)
@@ -131,7 +131,7 @@ export async function logAudit(params: {
   ipAddress?: string
   severity?: 'info' | 'warning' | 'error' | 'critical'
 }): Promise<void> {
-  const serviceClient = createServiceClient()
+  const serviceClient = createServiceClient().schema('platform')
   
   await serviceClient.rpc('log_audit', {
     p_user_id: params.userId,
